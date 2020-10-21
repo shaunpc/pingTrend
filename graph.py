@@ -3,9 +3,10 @@
 
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.ticker as tck
 import matplotlib.dates as mdates
+import time
 from database import Database
-from matplotlib.ticker import MultipleLocator
 
 sql_get_latest_ping_data = ('SELECT ping_timestamp, response_min, response_ave, \n'
                             '                            response_max, error_count FROM pingdata \n'
@@ -24,30 +25,26 @@ if __name__ == '__main__':
 
     # Set characteristics of ERROR chart
     ax_err.set_ylabel('Errors')
-    ax_err.set_ylim([0, 2])
-    ax_err.yaxis.set_major_formatter('{x:.0f}')
-    # ax_err.xaxis.set_major_locator(MultipleLocator(5))
-    # ax_err.xaxis.set_minor_locator(MultipleLocator(1))
-    ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    # ax_err.xaxis.set_major_locator(MultipleLocator(5))
-    ax_err.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)
+    ax_err.set_ylim(ymin=0, auto=True)          # Start from ZERO and autoscale when needed
+    ax_err.yaxis.set_major_formatter('{x:.0f}')     # remove decimal points from labels
+    ax_err.yaxis.set_minor_locator(tck.AutoMinorLocator())    # make minor ticks visible on y-axis
+    ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))     # format timestamp
+    ax_err.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     # Set characteristics of MAIN DATA chart
     ax.set_xlabel('Time')
     ax.set_ylabel('Ping Response Time (ms)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
-    plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")
-    minlocator = mdates.MinuteLocator(byminute=range(0, 60, 5))
-    ax.xaxis.set_minor_locator(minlocator)
-    # ax.xaxis.set_major_locator(MultipleLocator(5))
-    # ax.xaxis.set_minor_locator(MultipleLocator(1))
-    ax.yaxis.set_minor_locator(MultipleLocator(2.5))
-    ax.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)
+    plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
+    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5)))  # x-axis minor ticks every 5 mins
+    ax.yaxis.set_minor_locator(tck.AutoMinorLocator())              # make minor ticks visible on y-axis
+    ax.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     print("Starting data visualisation at {}".format(datetime.now()))
     first_time = True
     try:
         while True:
+            time.sleep(0.25)
             ping_time = []
             ping_min = []
             ping_ave = []
@@ -67,6 +64,8 @@ if __name__ == '__main__':
                 l_ave, = ax.plot_date(ping_time, ping_ave, marker='',  color='blue', linewidth=2, linestyle='solid', label='Ave')
                 l_max, = ax.plot_date(ping_time, ping_max, marker='',  color='orange', linewidth=1, linestyle='dashed', label='Max')
                 l_err, = ax_err.plot_date(ping_time, ping_err, marker='', color='red', linewidth=3, linestyle='solid', label='Error Count')
+                ax.legend(loc="upper left")
+                ax_err.legend(loc="upper left")
                 plt.pause(0.1)
                 first_time = False
             else:
@@ -79,6 +78,8 @@ if __name__ == '__main__':
                 l_max.set_ydata(ping_max)
                 l_err.set_xdata(ping_time)
                 l_err.set_ydata(ping_err)
+                fig.gca().relim()
+                fig.gca().autoscale_view()
                 fig.canvas.draw()
                 fig.canvas.flush_events()
                 plt.pause(0.1)

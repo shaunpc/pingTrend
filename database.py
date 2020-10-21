@@ -18,18 +18,21 @@ class Database:
     def execute(self, sql):
         try:
             self.cur.execute(sql)
+            self.conn.commit()
         except Error as e:
             print("Error: Database execute : {}".format(e))
 
     def insert(self, sql, values):
         try:
             self.cur.execute(sql, values)
+            self.conn.commit()
         except Error as e:
             print("Error: Database insert : {}".format(e))
 
     def select(self, sql):
         try:
             self.cur.execute(sql)
+            self.conn.commit()
         except Error as e:
             print("Error: Database select : {}".format(e))
         return self.cur.fetchall()

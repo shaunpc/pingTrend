@@ -21,7 +21,7 @@ class Counter:
                 self.c_min = item
             if item > self.c_max:
                 self.c_max = item
-            self.c_ave = ((self.c_ave * self.c_cnt) + item) / (self.c_cnt + 1)
+            self.c_ave = round(((self.c_ave * self.c_cnt) + item) / (self.c_cnt + 1), 2)
         self.c_cnt += 1
         return self.c_cnt
 
