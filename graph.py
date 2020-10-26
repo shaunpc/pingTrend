@@ -27,7 +27,8 @@ if __name__ == '__main__':
     ax_err.set_ylabel('Errors')
     ax_err.set_ylim(ymin=0, auto=True)          # Start from ZERO and autoscale when needed
     ax_err.yaxis.set_major_formatter('{x:.0f}')     # remove decimal points from labels
-    ax_err.yaxis.set_minor_locator(tck.AutoMinorLocator())    # make minor ticks visible on y-axis
+    ax_err.yaxis.set_major_locator(tck.MaxNLocator(integer=True))    # make major ticks only integer
+    # ax_err.yaxis.set_minor_locator(tck.AutoMinorLocator())    # make minor ticks visible on y-axis
     ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))     # format timestamp
     ax_err.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
@@ -78,8 +79,10 @@ if __name__ == '__main__':
                 l_max.set_ydata(ping_max)
                 l_err.set_xdata(ping_time)
                 l_err.set_ydata(ping_err)
-                fig.gca().relim()
-                fig.gca().autoscale_view()
+                ax.relim()
+                ax.autoscale_view()
+                ax_err.relim()
+                ax_err.autoscale_view()
                 fig.canvas.draw()
                 fig.canvas.flush_events()
                 plt.pause(0.1)
