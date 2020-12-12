@@ -1,15 +1,18 @@
 # Counters.py
 # simple class to help keep some running counts/averages
 
+import datetime
+
 
 class Counter:
 
     def __init__(self, name=None):
         self.name = name
+        self.start = datetime.datetime.now().__str__()
         self.c_cnt = 0
-        self.c_min = None
-        self.c_ave = None
-        self.c_max = None
+        self.c_min = 0
+        self.c_ave = 0
+        self.c_max = 0
 
     def add(self, item):
         if self.c_cnt == 0:
@@ -38,13 +41,11 @@ class Counter:
         return self.c_cnt
 
     def show(self):
-        if self.c_cnt > 0:
-            print("Counter:{}\t#:{}\tMin:{}\tAve:{}\t Max:{}".format(self.name, self.c_cnt, self.c_min,
-                                                                     format(self.c_ave, ".2f"), self.c_max))
-        else:
-            print("Counter:{}\t#:{}\tMin:{}\tAve:{}\t Max:{}".format(self.name, self.c_cnt, 0, 0, 0))
+        print("Counter:{} @ {}\t#:{}\tMin:{}\tAve:{}\t Max:{}".format(self.name, self.start, self.c_cnt, self.c_min,
+                                                                      format(self.c_ave, ".2f"), self.c_max))
 
     def reset(self):
+        self.start = datetime.datetime.now().__str__()
         self.c_cnt = 0
         self.c_min = None
         self.c_ave = None

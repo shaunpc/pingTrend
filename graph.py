@@ -37,7 +37,7 @@ if __name__ == '__main__':
     ax.set_ylabel('Ping Response Time (ms)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
-    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5)))  # x-axis minor ticks every 5 mins
+    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5), interval=1))  # x-axis minor ticks every 5 mins
     ax.yaxis.set_minor_locator(tck.AutoMinorLocator())              # make minor ticks visible on y-axis
     ax.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
