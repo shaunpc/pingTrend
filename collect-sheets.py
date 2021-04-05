@@ -16,8 +16,8 @@ from do_ping import batch_ping
 
 # The ID and range of a sample spreadsheet.
 SPREADSHEET_ID = '1msPTg36_M0BGCJTqKDcixZYpDTUx1ohBhZrcK09_8mE'        # MyDrive\pingtrend
-RANGE_DATA = 'PingData!A1:F1'
-RANGE_ERRORS = 'PingErrors!A1:D1'
+RANGE_DATA = 'PingData!A1:G1'
+RANGE_ERRORS = 'PingErrors!A1:E1'
 PING_HOST = 'www.google.com'
 
 
@@ -72,7 +72,8 @@ if __name__ == '__main__':
             #     print("Warning UNSAVED ERROR DATA : {}".format(len(unsaved_data)))
 
         # add the summary list to anything unsaved
-        unsaved_data.append([cnt_ping.start, PING_HOST, cnt_ping.min(), cnt_ping.ave(), cnt_ping.max(), cnt_err])
+        unsaved_data.append([cnt_ping.start.__str__(), PING_HOST, cnt_ping.min(), cnt_ping.ave(), cnt_ping.max(),
+                             cnt_err, cnt_ping.start.strftime('%A')])
         unsaved_data = store_data(RANGE_DATA, unsaved_data)
         # if len(unsaved_data) > 0:
         #     print("Warning UNSAVED PING DATA : {}".format(len(unsaved_data)))

@@ -2,6 +2,8 @@
 #   to visualise the recorded PING results
 
 from datetime import datetime
+# currently running with old version of numpy, due to Windows bug...
+#   pip install numpy==1.19.3
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 import matplotlib.dates as mdates
@@ -37,12 +39,13 @@ if __name__ == '__main__':
     ax.set_ylabel('Ping Response Time (ms)')
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
-    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5), interval=1))  # x-axis minor ticks every 5 mins
+    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5), interval=1))  # x-axis minor ticks each 5
     ax.yaxis.set_minor_locator(tck.AutoMinorLocator())              # make minor ticks visible on y-axis
     ax.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     print("Starting data visualisation at {}".format(datetime.now()))
     first_time = True
+    l_min, l_ave, l_max, l_err = 0, 0, 0, 0
     try:
         while True:
             time.sleep(0.25)
@@ -61,10 +64,14 @@ if __name__ == '__main__':
 
             if first_time:
                 # Plot the lines with formatting charactistics
-                l_min, = ax.plot_date(ping_time, ping_min, marker='', color='green', linewidth=1, linestyle='dashed', label='Min')
-                l_ave, = ax.plot_date(ping_time, ping_ave, marker='',  color='blue', linewidth=2, linestyle='solid', label='Ave')
-                l_max, = ax.plot_date(ping_time, ping_max, marker='',  color='orange', linewidth=1, linestyle='dashed', label='Max')
-                l_err, = ax_err.plot_date(ping_time, ping_err, marker='', color='red', linewidth=3, linestyle='solid', label='Error Count')
+                l_min, = ax.plot_date(ping_time, ping_min, marker='', color='green', linewidth=1,
+                                      linestyle='dashed', label='Min')
+                l_ave, = ax.plot_date(ping_time, ping_ave, marker='',  color='blue', linewidth=2,
+                                      linestyle='solid', label='Ave')
+                l_max, = ax.plot_date(ping_time, ping_max, marker='',  color='orange', linewidth=1,
+                                      linestyle='dashed', label='Max')
+                l_err, = ax_err.plot_date(ping_time, ping_err, marker='', color='red', linewidth=3,
+                                       linestyle='solid', label='Error Count')
                 ax.legend(loc="upper left")
                 ax_err.legend(loc="upper left")
                 plt.pause(0.1)

@@ -8,7 +8,7 @@ class Counter:
 
     def __init__(self, name=None):
         self.name = name
-        self.start = datetime.datetime.now().__str__()
+        self.start = datetime.datetime.now()
         self.c_cnt = 0
         self.c_min = 0
         self.c_ave = 0
@@ -41,8 +41,9 @@ class Counter:
         return self.c_cnt
 
     def show(self):
-        print("Counter:{} @ {}\t#:{}\tMin:{}\tAve:{}\t Max:{}".format(self.name, self.start, self.c_cnt, self.c_min,
-                                                                      format(self.c_ave, ".2f"), self.c_max))
+        print("Counter:{} @ {}\t#:{}\tMin:{}\tAve:{}\t Max:{}".format(self.name, self.start.strftime('%H:%M'),
+                                                                      self.c_cnt, self.c_min, format(self.c_ave, ".2f"),
+                                                                      self.c_max))
 
     def reset(self):
         self.start = datetime.datetime.now().__str__()

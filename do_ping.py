@@ -42,7 +42,8 @@ def batch_ping(host):
             if "Ping request could not find host" in err_full:
                 err_type = "NO HOST"
             error_details.append([timestamp.__str__(), host, err_type, err_full])
-            counter_err.add(1)
+            counter_err.add(1)  # increment the error count
+            counter.add(0)   # add a big fat zero to the latency counter
         else:
             counter.add(rt)
 
