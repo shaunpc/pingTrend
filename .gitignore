@@ -3,3 +3,6 @@
 /venv
 /venv/Scripts/
 /*.sqlite
+credentials.json
+token.pickle
+pingdatabase.sqlite
