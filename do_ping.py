@@ -8,7 +8,7 @@ from counter import Counter
 def ping(host):
     error = None
     r_time = -1
-    exec_ping = subprocess.run(["ping", "-n", "1" "-4", host], capture_output=True)
+    exec_ping = subprocess.run(["ping", "-n", "1", "-4", host], capture_output=True)
     if exec_ping.returncode == 0:
         lines = exec_ping.stdout.splitlines()
         if lines[2][:10] == b'Reply from':

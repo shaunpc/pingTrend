@@ -10,6 +10,8 @@ def get_google_creds(SCOPES):
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
+    # Sometimes, an "Invalid Grant: Token has been expired or revoked" message comes up...
+    # Simply, delete TOKEN.PICKLE, and restart -- it will request Google Account sign-in to recreate.
     if os.path.exists('token.pickle'):
         with open('token.pickle', 'rb') as token:
             creds = pickle.load(token)
