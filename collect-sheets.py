@@ -7,18 +7,16 @@
 #   https://www.appsheet.com/start/2aa910a9-b1bd-44e2-9caf-835da802c1bf#appName=UntitledApp-1995485
 
 import datetime
-
-import googleapiclient
-import googleapiclient.errors
 from googleapiclient.discovery import build
 from get_google_creds import get_google_creds
 from do_ping import batch_ping
+
+PING_HOST = 'www.google.com'
 
 # The ID and range of a sample spreadsheet.
 SPREADSHEET_ID = '1msPTg36_M0BGCJTqKDcixZYpDTUx1ohBhZrcK09_8mE'        # MyDrive\pingtrend
 RANGE_DATA = 'PingData!A1:G1'
 RANGE_ERRORS = 'PingErrors!A1:E1'
-PING_HOST = 'www.google.com'
 
 
 def store_data(sheetrange, data):
@@ -45,6 +43,8 @@ def store_data(sheetrange, data):
 # Main Routine.
 if __name__ == '__main__':
 
+    # PREP THE DATA STORE = GOOGLE SHEETS
+
     # If modifying these scopes, delete the file token.pickle.
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
     creds = get_google_creds(SCOPES)
@@ -53,6 +53,7 @@ if __name__ == '__main__':
     service = build('sheets', 'v4', credentials=creds)
     sheet = service.spreadsheets()
 
+    # START THE COMMON PROCESS
     print("Starting batch data collection at {}".format(datetime.datetime.now()))
     unsaved_data = []
     unsaved_errors = []
@@ -68,12 +69,9 @@ if __name__ == '__main__':
             print("Unsaved errors (POST-APP): {}".format(unsaved_errors))
             unsaved_errors = store_data(RANGE_ERRORS, unsaved_errors)
             print("Unsaved errors (AFTER): {}".format(unsaved_errors))
-            # if len(unsaved_data) > 0:
-            #     print("Warning UNSAVED ERROR DATA : {}".format(len(unsaved_data)))
 
         # add the summary list to anything unsaved
         unsaved_data.append([cnt_ping.start.__str__(), PING_HOST, cnt_ping.min(), cnt_ping.ave(), cnt_ping.max(),
                              cnt_err, cnt_ping.start.strftime('%A')])
         unsaved_data = store_data(RANGE_DATA, unsaved_data)
-        # if len(unsaved_data) > 0:
-        #     print("Warning UNSAVED PING DATA : {}".format(len(unsaved_data)))
+

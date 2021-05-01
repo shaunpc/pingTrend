@@ -19,6 +19,8 @@ def get_google_creds(SCOPES):
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
+            # IF THIS FAILS - and we will need to delete TOKEN.PICKLE and try again...
+
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
                 'credentials.json', SCOPES)
