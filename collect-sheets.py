@@ -8,8 +8,8 @@
 
 import datetime
 from googleapiclient.discovery import build
-from get_google_creds import get_google_creds
 from do_ping import batch_ping
+from get_google_creds import get_google_creds
 
 PING_HOST = 'www.google.com'
 

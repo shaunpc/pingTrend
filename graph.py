@@ -10,9 +10,10 @@ import matplotlib.dates as mdates
 import time
 from database import Database
 
-sql_get_latest_ping_data = ('SELECT ping_timestamp, response_min, response_ave, \n'
-                            '                            response_max, error_count FROM pingdata \n'
-                            '                            ORDER by ping_timestamp DESC LIMIT 400')
+sql_get_latest_ping_data = ("SELECT ping_timestamp, response_min, response_ave, \n"
+                            "                            response_max, error_count FROM pingdata \n"
+                            "                            WHERE date(ping_timestamp) > date('now', '-3 day')\n"      
+                            "                            ORDER by ping_timestamp DESC LIMIT 400")
 
 # Main Routine.
 if __name__ == '__main__':
@@ -21,7 +22,7 @@ if __name__ == '__main__':
 
     # Setup the display
     fig, (ax_err, ax) = plt.subplots(2, sharex='all', gridspec_kw={'height_ratios': [1, 4]})
-    fig.canvas.set_window_title('Ping Trends')
+    fig.canvas.manager.set_window_title('Ping Trends')
     fig.set_size_inches(14.0, 6.0)
     fig.suptitle('Ping Trends : {}'.format(ping_target))
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     ax_err.yaxis.set_major_locator(tck.MaxNLocator(integer=True))    # make major ticks only integer
     # ax_err.yaxis.set_minor_locator(tck.AutoMinorLocator())    # make minor ticks visible on y-axis
     ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))     # format timestamp
-    ax_err.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
+    ax_err.grid(visible=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     # Set characteristics of MAIN DATA chart
     ax.set_xlabel('Time')
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
     ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5), interval=1))  # x-axis minor ticks each 5
     ax.yaxis.set_minor_locator(tck.AutoMinorLocator())              # make minor ticks visible on y-axis
-    ax.grid(b=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
+    ax.grid(visible=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     print("Starting data visualisation at {}".format(datetime.now()))
     first_time = True
@@ -64,14 +65,10 @@ if __name__ == '__main__':
 
             if first_time:
                 # Plot the lines with formatting charactistics
-                l_min, = ax.plot_date(ping_time, ping_min, marker='', color='green', linewidth=1,
-                                      linestyle='dashed', label='Min')
-                l_ave, = ax.plot_date(ping_time, ping_ave, marker='',  color='blue', linewidth=2,
-                                      linestyle='solid', label='Ave')
-                l_max, = ax.plot_date(ping_time, ping_max, marker='',  color='orange', linewidth=1,
-                                      linestyle='dashed', label='Max')
-                l_err, = ax_err.plot_date(ping_time, ping_err, marker='', color='red', linewidth=3,
-                                       linestyle='solid', label='Error Count')
+                l_min, = ax.plot_date(ping_time, ping_min, fmt="--g", linewidth=1, label='Min') # dashed green
+                l_ave, = ax.plot_date(ping_time, ping_ave, fmt="-b", linewidth=2, label='Ave')  # solid blue
+                l_max, = ax.plot_date(ping_time, ping_max, fmt="--y", linewidth=1, label='Max') # dashed yellow
+                l_err, = ax_err.plot_date(ping_time, ping_err, fmt="-r", linewidth=3, label='Error Count') # solid red
                 ax.legend(loc="upper left")
                 ax_err.legend(loc="upper left")
                 plt.pause(0.1)
@@ -92,7 +89,7 @@ if __name__ == '__main__':
                 ax_err.autoscale_view()
                 fig.canvas.draw()
                 fig.canvas.flush_events()
-                plt.pause(0.1)
+                plt.pause(1)
     except KeyboardInterrupt:
         print("Finishing data visualisation at {}".format(datetime.now()))
         db.close()
