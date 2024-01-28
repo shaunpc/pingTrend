@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     # PREP THE DATA STORE = GOOGLE SHEETS
 
-    # If modifying these scopes, delete the file token.pickle.
+    # If modifying these scopes, delete the file token.json
     SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
     creds = get_google_creds(SCOPES)
 

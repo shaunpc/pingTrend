@@ -217,4 +217,6 @@ fabric.properties
 
 
 
-
+/token.json
+/credentials.json
+/pingdatabase.sqlite

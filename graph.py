@@ -2,8 +2,6 @@
 #   to visualise the recorded PING results
 
 from datetime import datetime
-# currently running with old version of numpy, due to Windows bug...
-#   pip install numpy==1.19.3
 import matplotlib.pyplot as plt
 import matplotlib.ticker as tck
 import matplotlib.dates as mdates

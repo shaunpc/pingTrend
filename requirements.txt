@@ -1,5 +1,9 @@
+#### requiements list ####
+# execute with: pip install -r .\requirements.txt
 matplotlib
 google-api-python-client
-google_auth_oauthlib
+google-auth-httplib2
+google-auth-oauthlib
 google
-art
+
+
