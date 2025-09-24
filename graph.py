@@ -8,6 +8,8 @@ import matplotlib.dates as mdates
 import time
 from database import Database
 
+ping_target = "www.google.com"
+db_file = r"C:\Users\shaun\PycharmProjects\pingTrend\pingdatabase.sqlite"
 sql_get_latest_ping_data = ("SELECT ping_timestamp, response_min, response_ave, \n"
                             "                            response_max, error_count FROM pingdata \n"
                             "                            WHERE date(ping_timestamp) > date('now', '-3 day')\n"      
@@ -15,8 +17,14 @@ sql_get_latest_ping_data = ("SELECT ping_timestamp, response_min, response_ave, 
 
 # Main Routine.
 if __name__ == '__main__':
-    db = Database(r"C:\Users\shaun\PycharmProjects\pingTrend\pingdatabase.sqlite")
-    ping_target = "www.google.com"
+
+    print("Parameters: ")
+    print("  Ping Target      : {}".format(ping_target))
+    print("  Database File    : {}".format(db_file))
+    print("  SQL to get data  : {}".format(sql_get_latest_ping_data))
+
+    #Initialise the database
+    db = Database(db_file)
 
     # Setup the display
     fig, (ax_err, ax) = plt.subplots(2, sharex='all', gridspec_kw={'height_ratios': [1, 4]})
@@ -25,20 +33,28 @@ if __name__ == '__main__':
     fig.suptitle('Ping Trends : {}'.format(ping_target))
 
     # Set characteristics of ERROR chart
+    # ax_err.set_xlabel('Time')
     ax_err.set_ylabel('Errors')
     ax_err.set_ylim(ymin=0, auto=True)          # Start from ZERO and autoscale when needed
     ax_err.yaxis.set_major_formatter('{x:.0f}')     # remove decimal points from labels
+    ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  # format timestamp
+    plt.setp(ax_err.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
+    ax_err.xaxis.set_minor_locator(
+        mdates.MinuteLocator(byminute=range(0, 60, 10), interval=1))  # x-axis minor ticks each 10 mins
     ax_err.yaxis.set_major_locator(tck.MaxNLocator(integer=True))    # make major ticks only integer
     # ax_err.yaxis.set_minor_locator(tck.AutoMinorLocator())    # make minor ticks visible on y-axis
-    ax_err.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))     # format timestamp
     ax_err.grid(visible=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
     # Set characteristics of MAIN DATA chart
     ax.set_xlabel('Time')
     ax.set_ylabel('Ping Response Time (ms)')
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
+    ax.set_ylim(ymin=0, auto=True)          # Start from ZERO and autoscale when needed
+    ax.yaxis.set_major_formatter('{x:.0f}')  # remove decimal points from labels
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))  # format timestamp
     plt.setp(ax.get_xticklabels(), rotation=30, ha='right', rotation_mode="anchor")     # angled X-labels
-    ax.xaxis.set_minor_locator(mdates.MinuteLocator(byminute=range(0, 60, 5), interval=1))  # x-axis minor ticks each 5
+    ax.xaxis.set_minor_locator(
+        mdates.MinuteLocator(byminute=range(0, 60, 10), interval=1))  # x-axis minor ticks each 10 mins
+    ax.yaxis.set_major_locator(tck.MaxNLocator(integer=True))  # make major ticks only integer
     ax.yaxis.set_minor_locator(tck.AutoMinorLocator())              # make minor ticks visible on y-axis
     ax.grid(visible=True, which='both', axis='y', color='silver', linewidth=0.25)  # add gridlines
 
@@ -47,7 +63,12 @@ if __name__ == '__main__':
     l_min, l_ave, l_max, l_err = 0, 0, 0, 0
     try:
         while True:
-            time.sleep(0.25)
+            # pretty inefficient....
+            # TODO: during first time, reset-arrays, and read all the -3day returned records...
+            # TODO: store the last/max timestamp observed, and on subsequent reads, only append new records
+            # TODO: should make database reads much quicker
+            time.sleep(2)  # set delay at 2 secs, rather than 0.25
+            db_latest_timestamp = datetime.strptime("2000-01-01 00:00:00.00", '%Y-%m-%d %H:%M:%S.%f')
             ping_time = []
             ping_min = []
             ping_ave = []
@@ -55,11 +76,15 @@ if __name__ == '__main__':
             ping_err = []
             pingdata = db.select(sql_get_latest_ping_data)
             for row in pingdata:
-                ping_time.append(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f'))
+                ping_timestamp = (datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f'))
+                ping_time.append(ping_timestamp)
                 ping_min.append(row[1])
                 ping_ave.append(row[2])
                 ping_max.append(row[3])
                 ping_err.append(row[4])
+                if ping_timestamp > db_latest_timestamp:
+                    db_latest_timestamp = ping_timestamp
+                    print("New latest timestamp: {}".format(db_latest_timestamp))
 
             if first_time:
                 # Plot the lines with formatting charactistics
@@ -87,7 +112,7 @@ if __name__ == '__main__':
                 ax_err.autoscale_view()
                 fig.canvas.draw()
                 fig.canvas.flush_events()
-                plt.pause(1)
+                plt.pause(5) # slowed down refresh to every 5 seconds
     except KeyboardInterrupt:
         print("Finishing data visualisation at {}".format(datetime.now()))
         db.close()

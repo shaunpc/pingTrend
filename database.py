@@ -37,6 +37,10 @@ class Database:
             print("Error: Database select : {}".format(e))
         return self.cur.fetchall()
 
+    def db_file(self):
+        print(self.file)
+        return self.file
+
     def close(self):
         self.cur.close()
         self.conn.close()
